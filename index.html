@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PICKLBALL</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap');
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg:   #000;
+    --text: #fff;
+    --dim:  rgba(255,255,255,0.35);
+    --lime: #c8f028;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    user-select: none;
+  }
+
+
+  #menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+  }
+
+
+  h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 1.8rem;
+    letter-spacing: 0.2em;
+    color: var(--lime);
+    text-transform: uppercase;
+  }
+
+
+  .subtitle {
+    font-size: 0.58rem;
+    letter-spacing: 0.15em;
+    color: var(--dim);
+    margin-top: -10px;
+  }
+
+
+  #game-toggle {
+    display: flex;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .game-btn {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    padding: 8px 18px;
+    background: transparent;
+    border: none;
+    color: var(--dim);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .game-btn.active { background: #fff; color: #000; }
+
+
+  #play-btn {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 13px 40px;
+    background: transparent;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  #play-btn:hover { background: #fff; color: #000; }
+</style>
+</head>
+<body>
+
+<div id="menu">
+  <h2>PICKLBALL</h2>
+
+  <div id="game-toggle">
+    <button class="game-btn active" data-href="drive.html">DRIVE</button>
+    <button class="game-btn" data-href="drop.html">DROP</button>
+    <button class="game-btn" data-href="dink.html">DINK</button>
+  </div>
+
+  <a id="play-btn" href="drive.html">PLAY</a>
+</div>
+
+<script>
+  const btns    = document.querySelectorAll('.game-btn');
+  const playBtn = document.getElementById('play-btn');
+
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      playBtn.href = btn.dataset.href;
+    });
+  });
+</script>
+</body>
+</html>
