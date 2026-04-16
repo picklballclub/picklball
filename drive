@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>drive</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap');
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg:   #000;
+    --text: #fff;
+    --dim:  rgba(255,255,255,0.35);
+    --lime: #c8f028;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    user-select: none;
+  }
+
+
+  #home-btn {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 13px 40px;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.35);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  #home-btn:hover { background: #fff; color: #000; }
+
+  #board-wrap { position: relative; }
+
+  #board {
+    display: grid;
+    gap: 4px;
+    padding: 4px;
+    background: rgba(0,0,0,0.6);
+    box-shadow: 0 0 40px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5);
+  }
+
+  #hud {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 12px 6px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.75), transparent);
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    color: var(--dim);
+    text-align: center;
+    pointer-events: none;
+    z-index: 5;
+  }
+  #hud .val {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    display: block;
+  }
+
+  .tile {
+    position: relative;
+    border-radius: 2px;
+    overflow: hidden;
+    cursor: pointer;
+    background: #000;
+  }
+  .tile-img {
+    position: absolute;
+    width: 75%; height: 75%;
+    top: 12.5%; left: 12.5%;
+    object-fit: contain;
+    pointer-events: none;
+    display: none;
+  }
+  .tile.active .tile-img { display: block; }
+
+  #overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    background: #000;
+    z-index: 10;
+  }
+  #overlay h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 1.8rem;
+    letter-spacing: 0.2em;
+    color: var(--lime);
+    text-transform: uppercase;
+    text-shadow: 0 0 16px rgba(200,240,40,0.4);
+  }
+  #overlay h2.ready { text-shadow: none; }
+
+  #score-row { display: flex; align-items: flex-end; gap: 20px; }
+  .score-block { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .score-label { font-size: 0.58rem; letter-spacing: 0.15em; color: var(--dim); }
+  .big-num { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; font-weight: 900; line-height: 1; }
+  #big-score { font-size: 3.5rem; }
+  #big-best  { color: var(--lime); }
+  .score-divider { width: 1px; height: 44px; background: rgba(255,255,255,0.15); margin-bottom: 6px; }
+
+  #play-btn {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 13px 40px;
+    background: transparent;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    transition: background 0.15s, color 0.15s;
+  }
+  #play-btn:hover { background: #fff; color: #000; }
+
+  #mode-toggle { display: flex; border-radius: 2px; overflow: hidden; }
+  .mode-btn {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    padding: 8px 18px;
+    background: transparent;
+    border: none;
+    color: var(--dim);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .mode-btn.soft        { background: #fff; color: #000; }
+  .mode-btn.hard.active { background: #fff; color: #000; }
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+  }
+  .btn-group #play-btn,
+  .btn-group #home-btn {
+    display: block;
+    text-align: center;
+    box-sizing: border-box;
+  }
+</style>
+</head>
+<body>
+
+<div id="board-wrap">
+  <div id="hud">
+    <div>SCORE<br><span class="val" id="score-el">0</span></div>
+    <div>TIME<br><span class="val" id="timer-el">30</span></div>
+    <div>BEST<br><span class="val" id="best-el">0</span></div>
+    <div>COMBO<br><span class="val" id="combo-el">×1</span></div>
+  </div>
+  <div id="board"></div>
+  <div id="overlay">
+    <h2 class="ready" id="ov-title">drive</h2>
+    <div id="score-row" style="display:none">
+      <div class="score-block">
+        <span class="score-label">SCORE</span>
+        <div id="big-score" class="big-num"></div>
+      </div>
+      <div class="score-divider"></div>
+      <div class="score-block">
+        <span class="score-label">BEST</span>
+        <div id="big-best" class="big-num"></div>
+      </div>
+      <div class="score-divider"></div>
+      <div class="score-block">
+        <span class="score-label">COMBO</span>
+        <div id="big-combo" class="big-num"></div>
+      </div>
+    </div>
+    <div id="mode-toggle">
+      <button class="mode-btn soft" id="btn-soft">SOFT</button>
+      <button class="mode-btn hard" id="btn-hard">HARD</button>
+    </div>
+    <div class="btn-group"><button id="play-btn">PLAY</button><a id="home-btn" href="index.html">HOME</a></div>
+  </div>
+</div>
+
+<script>
+const COLS = 4, ROWS = 6, GAP = 4, GAME_TIME = 30;
+
+const TILE_SRC = (() => {
+  const c = document.createElement('canvas');
+  c.width = c.height = 64;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(4,4,56,56);
+  ctx.fillStyle = '#c8f028';
+  ctx.fillRect(12,12,40,40);
+  ctx.fillStyle = '#000';
+  ctx.fillRect(20,20,24,24);
+  return c.toDataURL();
+})();
+
+const $ = id => document.getElementById(id);
+const boardEl  = $('board'),  overlay  = $('overlay'),  ovTitle = $('ov-title');
+const scoreRow = $('score-row');
+const bigScore = $('big-score'), bigBest = $('big-best'), bigCombo = $('big-combo');
+const playBtn  = $('play-btn');
+const scoreEl  = $('score-el'), bestEl  = $('best-el');
+const comboEl  = $('combo-el'), timerEl = $('timer-el');
+const btnSoft  = $('btn-soft'), btnHard = $('btn-hard');
+
+let hardMode = false;
+const modeKey = () => hardMode ? 'hard' : 'soft';
+
+btnSoft.addEventListener('click', () => {
+  hardMode = false;
+  btnSoft.classList.add('soft');
+  btnHard.classList.remove('active');
+  bestEl.textContent = best[modeKey()];
+});
+btnHard.addEventListener('click', () => {
+  hardMode = true;
+  btnHard.classList.add('active');
+  btnSoft.classList.remove('soft');
+  bestEl.textContent = best[modeKey()];
+});
+
+let tileSize, cells = [];
+
+function buildBoard() {
+  const maxW = Math.min(window.innerWidth  - 40, 340);
+  const maxH = Math.min(window.innerHeight - 80, 480);
+  tileSize = Math.min(
+    Math.floor((maxW - GAP * (COLS - 1) - 8) / COLS),
+    Math.floor((maxH - GAP * (ROWS - 1) - 8) / ROWS)
+  );
+  boardEl.style.gridTemplateColumns = `repeat(${COLS}, ${tileSize}px)`;
+  boardEl.style.gridTemplateRows    = `repeat(${ROWS}, ${tileSize}px)`;
+  boardEl.innerHTML = '';
+  cells = [];
+  for (let r = 0; r < ROWS; r++) {
+    cells[r] = [];
+    for (let c = 0; c < COLS; c++) {
+      const tile = document.createElement('div');
+      const img  = document.createElement('img');
+      tile.className = 'tile';
+      tile.dataset.row = r;
+      tile.dataset.col = c;
+      img.className = 'tile-img';
+      img.src = TILE_SRC;
+      img.alt = '';
+      tile.appendChild(img);
+      boardEl.appendChild(tile);
+      cells[r][c] = tile;
+    }
+  }
+}
+
+let audioCtx;
+const getCtx = () => audioCtx ??= new (window.AudioContext || window.webkitAudioContext)();
+function chain(...nodes) {
+  const ctx = getCtx();
+  for (let i = 0; i < nodes.length - 1; i++) nodes[i].connect(nodes[i + 1]);
+  nodes.at(-1).connect(ctx.destination);
+}
+
+function playHit() {
+  const ctx = getCtx(), t = ctx.currentTime;
+  const f = 60 + Math.random() * 60;
+  const body  = Object.assign(ctx.createOscillator(), { type: 'sine' });
+  const bGain = ctx.createGain();
+  body.frequency.setValueAtTime(f * 2.2, t);
+  body.frequency.exponentialRampToValueAtTime(f,       t + 0.004);
+  body.frequency.exponentialRampToValueAtTime(f * 0.5, t + 0.035);
+  bGain.gain.setValueAtTime(0.7, t);
+  bGain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+  chain(body, bGain);
+  body.start(t); body.stop(t + 0.06);
+}
+
+function playMiss() {
+  const ctx  = getCtx(), t = ctx.currentTime;
+  const osc  = Object.assign(ctx.createOscillator(), { type: 'sawtooth' });
+  const gain = ctx.createGain();
+  osc.frequency.setValueAtTime(120, t);
+  osc.frequency.exponentialRampToValueAtTime(60, t + 0.15);
+  gain.gain.setValueAtTime(0.18, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+  chain(osc, gain);
+  osc.start(t); osc.stop(t + 0.2);
+}
+
+let score, best = { soft: 0, hard: 0 }, combo;
+let running, timeLeft, countdownTimer;
+let activeRow = -1, activeCol = -1;
+let missTimer = null, firstTilePressed = false;
+let lastRow = -1, lastCol = -1;
+
+function getRandomCell() {
+  let r, c, tries = 0;
+  do {
+    r = Math.floor(Math.random() * ROWS);
+    c = Math.floor(Math.random() * COLS);
+    tries++;
+  } while (r === lastRow && c === lastCol && tries < 20);
+  return [r, c];
+}
+
+function clearActive() {
+  if (activeRow >= 0) cells[activeRow][activeCol].className = 'tile';
+  activeRow = activeCol = -1;
+  clearTimeout(missTimer); missTimer = null;
+}
+
+function spawnNext() {
+  if (!running) return;
+  clearActive();
+  [lastRow, lastCol] = getRandomCell();
+  activeRow = lastRow; activeCol = lastCol;
+  cells[activeRow][activeCol].className = 'tile active';
+  if (firstTilePressed) {
+    missTimer = setTimeout(() => { if (running) endGame('MISS'); }, 500);
+  }
+}
+
+function handleTap(r, c) {
+  if (!running) return;
+  if (r === activeRow && c === activeCol) {
+    if (!countdownTimer) countdownTimer = setInterval(tick, 1000);
+    firstTilePressed = true;
+    clearTimeout(missTimer); missTimer = null;
+    cells[r][c].className = 'tile';
+    playHit();
+    combo = Math.min(combo + 1, 16);
+    score += combo;
+    scoreEl.textContent = score;
+    comboEl.textContent = `×${combo}`;
+    activeRow = activeCol = -1;
+    spawnNext();
+  } else {
+    endGame('MISS');
+  }
+}
+
+function tick() {
+  timerEl.textContent = --timeLeft;
+  if (timeLeft <= 5) timerEl.style.color = '#fff';
+  if (timeLeft <= 0) { clearInterval(countdownTimer); endGame('TIME'); }
+}
+
+function startGame() {
+  score = 0; combo = 1; running = true;
+  timeLeft = GAME_TIME;
+  lastRow = lastCol = -1;
+  activeRow = activeCol = -1;
+  clearTimeout(missTimer); missTimer = null;
+  clearInterval(countdownTimer); countdownTimer = null;
+  firstTilePressed = false;
+  scoreEl.textContent = 0;
+  comboEl.textContent = '×1';
+  timerEl.textContent = GAME_TIME;
+  timerEl.style.color = '';
+  bestEl.textContent  = best[modeKey()];
+  overlay.style.display = 'none';
+  for (let r = 0; r < ROWS; r++)
+    for (let c = 0; c < COLS; c++)
+      cells[r][c].className = 'tile';
+  spawnNext();
+}
+
+function endGame(reason = 'TIME') {
+  running = false;
+  clearTimeout(missTimer); missTimer = null;
+  clearInterval(countdownTimer);
+  if (activeRow >= 0) { cells[activeRow][activeCol].className = 'tile'; activeRow = activeCol = -1; }
+  const key = modeKey();
+  if (score > best[key]) { best[key] = score; bestEl.textContent = best[key]; }
+  setTimeout(() => {
+    overlay.style.display  = 'flex';
+    ovTitle.textContent    = reason === 'TIME' ? "TIME'S UP" : 'GAME OVER';
+    ovTitle.className      = 'ready';
+    scoreRow.style.display = 'flex';
+    bigScore.textContent   = score;
+    bigBest.textContent    = best[modeKey()];
+    bigCombo.textContent   = `×${combo}`;
+    playBtn.textContent    = 'PLAY AGAIN';
+  }, 200);
+}
+
+boardEl.addEventListener('mousedown', e => {
+  const tile = e.target.closest('.tile');
+  if (tile && running) handleTap(+tile.dataset.row, +tile.dataset.col);
+});
+
+boardEl.addEventListener('touchstart', e => {
+  e.preventDefault();
+  const { clientX, clientY } = e.changedTouches[0];
+  const el = document.elementFromPoint(clientX, clientY)?.closest('.tile');
+  if (el && running) handleTap(+el.dataset.row, +el.dataset.col);
+}, { passive: false });
+
+playBtn.addEventListener('click', startGame);
+window.addEventListener('resize', buildBoard);
+
+buildBoard();
+</script>
+</body>
+</html>
