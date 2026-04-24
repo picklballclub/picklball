@@ -104,8 +104,16 @@
     object-fit: contain;
     pointer-events: none;
     display: none;
+    opacity: 1;
   }
   .tile.active .tile-img { display: block; }
+  body.hard-mode .tile-img {
+    width: 60%;
+    height: 60%;
+    top: 20%;
+    left: 20%;
+    opacity: 0.35;
+  }
 
   #overlay {
     position: absolute;
@@ -235,18 +243,16 @@ const btnSoft  = $('btn-soft'), btnHard = $('btn-hard');
 let hardMode = false;
 const modeKey = () => hardMode ? 'hard' : 'soft';
 
-btnSoft.addEventListener('click', () => {
-  hardMode = false;
-  btnSoft.classList.add('soft');
-  btnHard.classList.remove('active');
+function setMode(isHard) {
+  hardMode = isHard;
+  btnSoft.classList.toggle('soft', !isHard);
+  btnHard.classList.toggle('active', isHard);
+  document.body.classList.toggle('hard-mode', isHard);
   bestEl.textContent = best[modeKey()];
-});
-btnHard.addEventListener('click', () => {
-  hardMode = true;
-  btnHard.classList.add('active');
-  btnSoft.classList.remove('soft');
-  bestEl.textContent = best[modeKey()];
-});
+}
+
+btnSoft.addEventListener('click', () => setMode(false));
+btnHard.addEventListener('click', () => setMode(true));
 
 let tileSize, cells = [];
 
@@ -318,6 +324,8 @@ let running, timeLeft, countdownTimer;
 let activeRow = -1, activeCol = -1;
 let missTimer = null, firstTilePressed = false;
 let lastRow = -1, lastCol = -1;
+const SOFT_MISS_MS = 500;
+const HARD_MISS_MS = 320;
 
 function getRandomCell() {
   let r, c, tries = 0;
@@ -342,7 +350,10 @@ function spawnNext() {
   activeRow = lastRow; activeCol = lastCol;
   cells[activeRow][activeCol].className = 'tile active';
   if (firstTilePressed) {
-    missTimer = setTimeout(() => { if (running) endGame('MISS'); }, 500);
+    missTimer = setTimeout(
+      () => { if (running) endGame('MISS'); },
+      hardMode ? HARD_MISS_MS : SOFT_MISS_MS
+    );
   }
 }
 
@@ -384,6 +395,7 @@ function startGame() {
   timerEl.textContent = GAME_TIME;
   timerEl.style.color = '';
   bestEl.textContent  = best[modeKey()];
+  document.body.classList.toggle('hard-mode', hardMode);
   overlay.style.display = 'none';
   for (let r = 0; r < ROWS; r++)
     for (let c = 0; c < COLS; c++)
