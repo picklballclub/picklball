@@ -40,7 +40,6 @@
     user-select: none;
   }
 
-
   #menu {
     display: flex;
     flex-direction: column;
@@ -48,7 +47,6 @@
     justify-content: center;
     gap: 18px;
   }
-
 
   h2 {
     font-family: 'Orbitron', sans-serif;
@@ -59,14 +57,12 @@
     text-transform: uppercase;
   }
 
-
   .subtitle {
     font-size: 0.58rem;
     letter-spacing: 0.15em;
     color: var(--dim);
     margin-top: -10px;
   }
-
 
   #game-toggle {
     display: flex;
@@ -90,6 +86,12 @@
   }
   .game-btn.active { background: #fff; color: #000; }
 
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
 
   #play-btn {
     font-family: 'Orbitron', sans-serif;
@@ -97,16 +99,131 @@
     font-weight: 700;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    padding: 12px 40px;
+    padding: 13px 40px;
     background: transparent;
     border: none;
     color: #fff;
     cursor: pointer;
     transition: background 0.15s, color 0.15s;
     text-decoration: none;
-    display: inline-block;
+    display: block;
+    text-align: center;
+    box-sizing: border-box;
   }
-  #play-btn:hover { background: #fff; color: #000; }
+  #play-btn:hover { opacity: 0.6; }
+
+  #about-btn {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 13px 40px;
+    background: transparent;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    display: block;
+    text-align: center;
+    box-sizing: border-box;
+  }
+  #about-btn:hover { opacity: 0.6; }
+
+  /* ── About Modal ── */
+  #about-modal {
+    position: absolute;
+    inset: 0;
+    background: #000;
+    z-index: 20;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 36px 28px 28px;
+    overflow-y: auto;
+    gap: 24px;
+  }
+  #about-modal.open { display: flex; }
+
+  #about-modal h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 1.1rem;
+    letter-spacing: 0.2em;
+    color: var(--lime);
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .about-tagline {
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    color: var(--dim);
+    text-align: center;
+    margin-top: -16px;
+    line-height: 1.6;
+    max-width: 280px;
+  }
+
+  .about-games {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .about-card {
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+  }
+
+  .about-card-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: #fff;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .about-card-desc {
+    font-size: 0.54rem;
+    letter-spacing: 0.08em;
+    color: var(--dim);
+    line-height: 1.65;
+    text-align: center;
+  }
+
+  .about-card-brain {
+    font-size: 0.52rem;
+    letter-spacing: 0.07em;
+    color: rgba(200,240,40,0.55);
+    line-height: 1.55;
+    margin-top: 2px;
+    text-align: center;
+  }
+
+  #close-about {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 10px 36px;
+    background: transparent;
+    border: none;
+    color: var(--dim);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    margin-top: 6px;
+  }
+  #close-about:hover { background: #fff; color: #000; }
 </style>
 </head>
 <body>
@@ -120,12 +237,60 @@
     <button class="game-btn" data-href="dink.html">DINK</button>
   </div>
 
-  <a id="play-btn" href="drive.html">PLAY</a>
+  <div class="btn-group">
+    <a id="play-btn" href="drive.html">PLAY</a>
+    <button id="about-btn">ABOUT</button>
+  </div>
+</div>
+
+<!-- About Modal -->
+<div id="about-modal">
+  <h3>ABOUT</h3>
+  <p class="about-tagline">Three mini-games to prime your hands,<br>eyes, and mind before you hit the court.</p>
+
+  <div class="about-games">
+
+    <div class="about-card">
+      <div class="about-card-title">DRIVE</div>
+      <div class="about-card-desc">
+        A rapid-fire reaction game. Tiles light up one at a time across a grid — tap the active tile before the timer expires. Miss the tile or tap the wrong one and it's over. Hits build a combo multiplier up to ×16, rewarding streaks over a 30-second run. Hard mode cuts the reaction window nearly in half.
+      </div>
+      <div class="about-card-brain">
+        ↳ Fires up hand-eye coordination and sharpens split-second decision-making — the same reflexes you need when a fast drive is coming at your feet.
+      </div>
+    </div>
+
+    <div class="about-card">
+      <div class="about-card-title">DROP</div>
+      <div class="about-card-desc">
+        A memory sequence game. The board flashes a pattern of tiles in order — watch, remember, then reproduce it exactly. Sequences grow longer each round, and a single wrong tap ends the game. Easy mode gives you more time to study the pattern; hard mode blinks through it fast.
+      </div>
+      <div class="about-card-brain">
+        ↳ Activates working memory and spatial recall — the same mental focus needed to read the court and anticipate where the next ball is headed.
+      </div>
+    </div>
+
+    <div class="about-card">
+      <div class="about-card-title">DINK</div>
+      <div class="about-card-desc">
+        A rhythm and timing game. Tiles scroll downward in columns — tap the correct column when the active tile reaches the bottom row. The pace accelerates as your score climbs. Hard mode blacks out the board, leaving only a floating tile visible so you're navigating almost purely on timing.
+      </div>
+      <div class="about-card-brain">
+        ↳ Trains rhythmic timing and sustained focus under pressure — exactly the patience and precision the dink game demands at the kitchen line.
+      </div>
+    </div>
+
+  </div>
+
+  <button id="close-about">CLOSE</button>
 </div>
 
 <script>
-  const btns    = document.querySelectorAll('.game-btn');
-  const playBtn = document.getElementById('play-btn');
+  const btns      = document.querySelectorAll('.game-btn');
+  const playBtn   = document.getElementById('play-btn');
+  const aboutBtn  = document.getElementById('about-btn');
+  const modal     = document.getElementById('about-modal');
+  const closeBtn  = document.getElementById('close-about');
 
   btns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -134,6 +299,9 @@
       playBtn.href = btn.dataset.href;
     });
   });
+
+  aboutBtn.addEventListener('click', () => modal.classList.add('open'));
+  closeBtn.addEventListener('click', () => modal.classList.remove('open'));
 </script>
 </body>
 </html>
