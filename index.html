@@ -142,7 +142,7 @@
     justify-content: flex-start;
     padding: 36px 28px 28px;
     overflow-y: auto;
-    gap: 24px;
+    gap: 14px;
   }
   #about-modal.open { display: flex; }
 
@@ -157,19 +157,20 @@
   }
 
   .about-tagline {
-    font-size: 0.58rem;
-    letter-spacing: 0.12em;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
     color: var(--dim);
     text-align: center;
     margin-top: -16px;
-    line-height: 1.6;
-    max-width: 280px;
+    line-height: 1.8;
+    max-width: 300px;
   }
 
   .about-games {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 14px;
     width: 100%;
     max-width: 320px;
   }
@@ -184,46 +185,55 @@
 
   .about-card-title {
     font-family: 'Orbitron', sans-serif;
-    font-size: 0.65rem;
+    font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.25em;
     color: #fff;
     text-transform: uppercase;
     text-align: center;
+    margin-top: -8px;
+    margin-bottom: 4px;
   }
 
   .about-card-desc {
-    font-size: 0.54rem;
-    letter-spacing: 0.08em;
-    color: var(--dim);
-    line-height: 1.65;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    color: rgba(255,255,255,0.6);
+    margin-top: -8px;
+    line-height: 1.9;
     text-align: center;
   }
 
   .about-card-brain {
-    font-size: 0.52rem;
-    letter-spacing: 0.07em;
-    color: rgba(200,240,40,0.55);
-    line-height: 1.55;
-    margin-top: 2px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.58rem;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    color: #c8f028;
+    line-height: 1.85;
+    margin-top: 4px;
     text-align: center;
   }
 
   #close-about {
     font-family: 'Orbitron', sans-serif;
-    font-size: 0.6rem;
+    font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    padding: 10px 36px;
+    padding: 13px 40px;
     background: transparent;
     border: none;
-    color: var(--dim);
+    color: #fff;
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
-    margin-top: 6px;
+    transition: opacity 0.15s;
+    display: block;
+    text-align: center;
+    box-sizing: border-box;
   }
-  #close-about:hover { background: #fff; color: #000; }
+  #close-about:hover { opacity: 0.6; }
 </style>
 </head>
 <body>
